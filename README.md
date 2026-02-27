@@ -1,2 +1,132 @@
 # Dino-77-game-x
 Xd
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dino Pro 77</title>
+
+<!-- SEO y preview -->
+<meta property="og:title" content="Dino Pro 77">
+<meta property="og:description" content="Juego oficial creado por Diego alias el chicano">
+<meta property="og:type" content="website">
+
+<style>
+body{
+    margin:0;
+    overflow:hidden;
+    background: linear-gradient(to bottom,#87CEEB,#ffffff);
+    font-family: Arial, sans-serif;
+}
+
+canvas{
+    display:block;
+}
+
+#ui{
+    position:fixed;
+    top:20px;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:28px;
+    font-weight:bold;
+    color:#222;
+}
+</style>
+</head>
+<body>
+
+<div id="ui">Dino Pro 77 | Puntuación: <span id="score">0</span></div>
+<canvas id="game"></canvas>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let dino = {
+    x: 80,
+    y: canvas.height - 150,
+    width: 60,
+    height: 60,
+    velocity: 0,
+    gravity: 1.2,
+    jumping: false
+};
+
+let obstacle = {
+    x: canvas.width,
+    y: canvas.height - 120,
+    width: 40,
+    height: 80,
+    speed: 8
+};
+
+let score = 0;
+
+function drawDino(){
+    ctx.fillStyle = "#2ecc71";
+    ctx.fillRect(dino.x, dino.y, dino.width, dino.height);
+}
+
+function drawObstacle(){
+    ctx.fillStyle = "#e74c3c";
+    ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+}
+
+function update(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    // Dino physics
+    dino.velocity += dino.gravity;
+    dino.y += dino.velocity;
+
+    if(dino.y >= canvas.height - 150){
+        dino.y = canvas.height - 150;
+        dino.jumping = false;
+    }
+
+    // Obstacle movement
+    obstacle.x -= obstacle.speed;
+    if(obstacle.x < -obstacle.width){
+        obstacle.x = canvas.width + Math.random()*300;
+        score++;
+        document.getElementById("score").innerText = score;
+    }
+
+    // Collision
+    if(dino.x < obstacle.x + obstacle.width &&
+       dino.x + dino.width > obstacle.x &&
+       dino.y < obstacle.y + obstacle.height &&
+       dino.y + dino.height > obstacle.y){
+        alert("Game Over 😈\nPuntuación: " + score);
+        location.reload();
+    }
+
+    drawDino();
+    drawObstacle();
+    requestAnimationFrame(update);
+}
+
+document.addEventListener("keydown", function(e){
+    if(e.code === "Space" && !dino.jumping){
+        dino.velocity = -20;
+        dino.jumping = true;
+    }
+});
+
+document.addEventListener("touchstart", function(){
+    if(!dino.jumping){
+        dino.velocity = -20;
+        dino.jumping = true;
+    }
+});
+
+update();
+</script>
+
+</body>
+</html>
